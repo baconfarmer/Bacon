@@ -7,7 +7,7 @@ module.exports = config = {
     
     "redis_host" :"10.3.0.41", //"omadc-cyclone-redis1.psm.local",//
     "redis_port" : 6379,
-    
+
     "mongo_host" : "10.3.0.42",//"omadc-cyclone-mongo1.psm.local",//
     "mongo_db_name" : "cyclone",
     "mongo_port" : 27017,
