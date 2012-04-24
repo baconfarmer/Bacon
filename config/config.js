@@ -2,7 +2,7 @@ module.exports = config = {
     "name" : "Cyclone",
 
     "tracking_port" : 3000,//3000,
-    "beacon_port" : 80,
+    "beacon_port" : 8080,
     "dashboard_port" :8000,// 8888,
     
     "redis_host" :"10.3.0.41", //"omadc-cyclone-redis1.psm.local",//
@@ -17,5 +17,5 @@ module.exports = config = {
     "udp_address" : "127.0.0.1",
     "udp_port" : 8000,
 
-    "debug":0
+    "debug":1
 }

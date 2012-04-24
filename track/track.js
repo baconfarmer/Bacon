@@ -1,18 +1,29 @@
 var config = require('../config/config'),
     path = require("path"),
     fs = require('fs');
-var db_connection;
 
-var Track = function(db, callback) {
+var Track = function(tracker_app, db, callback) {
+    callback = typeof callback !== 'undefined' ? callback : function(){};
+    this.app=tracker_app;
+    this.db_connection=db;
     var pixelData = fs.readFileSync(path.join(__dirname, '..', 'public/images/')+'tracking.gif', 'binary');
     this.pixel = new Buffer(43);
     this.pixel.write(pixelData, 'binary', 0);
-//    this.metrics = [];
+    this.init();
+    callback();
 };
 
 Track.prototype = {
-    init: function(db, callback) {
-        db_connection=db;
+    init: function(callback) {
+        callback = typeof callback !== 'undefined' ? callback : function(){};
+        self=this;
+        this.app.listen(config.tracking_port, function() {
+            address = self.app.address();
+            console.log("opened tracking server on %j", address);
+        });
+        this.app.get('/', function(req, res){
+             self.serveRequest(req, res);
+        });
         callback();
     },
     serveRequest: function(req, res) {
@@ -31,11 +42,12 @@ Track.prototype = {
 //                console.log("metrics tracking " + name);
 //            }
             if (!config.metrics.indexOf(name)){
-                db_connection.incrCounter(name,env.timestamp,env[name]);
+                this.db_connection.incrCounter(name,env.timestamp,env[name]);
             }
         }
 
         //log raw data
+        var collection = 'visit';
         //get ip address
         env.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         //get header
@@ -45,8 +57,12 @@ Track.prototype = {
                 env.refer = req.headers['referer'];
             }
         }
+        else{
+            collection='action';
+        }
+
         //insert into db
-        db_connection.insRaw(env);
+        this.db_connection.insRaw(env, collection);
     },
     splitQuery: function(query) {
         var queryString = {};

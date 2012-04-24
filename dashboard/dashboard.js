@@ -1,21 +1,59 @@
 var config = require('../config/config.js'),
-    path = require("path"),
-    fs = require('fs');
-var db_connection;
+    express = require('express');
 
-var Dashboard = function(db, callback) {
-//    this.metrics = [];
+var Dashboard = function(dashboard_app, db, callback) {
+    callback = typeof callback !== 'undefined' ? callback : function(){};
+    this.db_connection=db;
+    this.app=dashboard_app;
+    this.init();
+    callback();
 };
 
 Dashboard.prototype = {
-    init: function(db, callback) {
-        db_connection=db;
+    init: function(callback) {
+        callback = typeof callback !== 'undefined' ? callback : function(){};
+        var self=this;
+        self.app.configure(function(){
+            //setup middleware
+            self.app.use(express.logger());
+            self.app.use(express.bodyParser());
+            self.app.use(self.app.router);
+            if(config.debug){
+                console.log('Dashboard in dev');
+                self.app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+            }
+            else{
+                console.log('Dashboard in prod');
+                self.app.use(express.errorHandler());
+            }
+        });
+        self.app.listen(config.dashboard_port, function() {
+            address = self.app.address();
+            console.log("opened dashboard server on %j", address);
+            dashboard_started = true;
+        });
+
+        self.app.get('/metrics/:name/:time?', function(req, res){
+            //name of metric
+            var name = req.params.name;
+            var time = req.params.time;
+            if (!config.metrics.indexOf(name)) {
+                if (!time){
+                    time=60;
+                }
+                self.getMetric(name,time,function(value){
+                    res.json(value);
+                });
+            } else {
+                next();
+            }
+        });
         callback();
     },
     getMetric: function(name,time,callback) {
         callback = typeof callback !== 'undefined' ? callback : function(){};
         var self = this;
-        db_connection.getMetric(name,time,function(keys, value) {
+        this.db_connection.getMetric(name,time,function(keys, value) {
             var settings ={};
             var ymax=Math.max(Math.max.apply( Math, value ),5);
             var ymin=Math.min.apply( Math, value );
@@ -34,7 +72,5 @@ Dashboard.prototype = {
         return t.getHours()+":"+t.getMinutes()+':'+t.getSeconds();
     }
 }
-
-
 
 exports.Dashboard = Dashboard;

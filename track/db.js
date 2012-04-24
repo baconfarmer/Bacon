@@ -37,20 +37,20 @@ Db.prototype = {
             console.log(err);
         });
     },
-    insRaw: function(env) {
-//        env.timestamp = new Date();
-
-        if(env.action){
-            if(config.debug){
-                console.log("Mongod - actions");
-            }
-            this.actions.insert([env]);
-        }
-        else{
-            if(config.debug){
-                console.log("Mongod - visits");
-            }
-            this.visits.insert([env]);
+    insRaw: function(env, collection) {
+        switch(collection){
+            case "action":
+                if(config.debug){
+                    console.log("Mongod - actions");
+                }
+                this.actions.insert([env]);
+                break;
+            case "visit":
+                if(config.debug){
+                    console.log("Mongod - visits");
+                }
+                this.visits.insert([env]);
+                break;
         }
     },
     incrCounter: function(metric_name, time, count, callback){
