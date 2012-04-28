@@ -7,7 +7,10 @@ jQuery(document).ready(function() {
 
 function track_init() {
     env = {};
-    env.u = document.location.href;
+    env.h = document.location.host.toString();
+    path = document.location.pathname.toString();
+    path = typeof path !== 'undefined' ? path : '/';
+    env.p = path;
     env.bw = window.innerWidth;
     env.bh = window.innerHeight;
     env.title = document.title;
@@ -16,14 +19,9 @@ function track_init() {
     if (document.referrer && document.referrer !== "") {
         env.ref = document.referrer;
     }
-//    if (cyclone_dt) {
-//        env.action = 'page_load';
-//        env.action_misc = '';
-//        env.timing = new Date() - cyclone_dt;
-//    }
     jQuery('body').append('<img style="display:none;" src="http://97.107.198.131:3000/?' + jQuery.param(env) + '"/>');
     track('page_load',  new Date() - cyclone_dt);
-    jQuery.getScript('http://97.107.198.131:8000/beacon');
+    jQuery.getScript('http://97.107.198.131:8000/url'+path);
     return guid;
 }
 

@@ -38,14 +38,10 @@ Track.prototype = {
         //for each in config.metrics[] call incCounter() with the metrics name
         var name;
         for (name in env){
-//            if(config.debug){
-//                console.log("metrics tracking " + name);
-//            }
             if (!config.metrics.indexOf(name)){
                 this.db_connection.incrCounter(name,env.timestamp,env[name]);
             }
         }
-
         //log raw data
         var collection = 'visit';
         //get ip address
@@ -60,7 +56,6 @@ Track.prototype = {
         else{
             collection='action';
         }
-
         //insert into db
         this.db_connection.insRaw(env, collection);
     },

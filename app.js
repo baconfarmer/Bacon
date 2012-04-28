@@ -10,7 +10,7 @@ var dashboard = 0;
 
 //setup databases
 var db = new Db(function(){
-    //setup interal tracker
+    //setup internal tracker
     if(tracker === 0){
         tracker = new Track(express.createServer(),db);
     }

@@ -39,6 +39,16 @@ Beacon.prototype = {
             console.log("error");
         });
 
+        for (url in config.urls){
+            if(config.debug){
+                console.log(url +' maps to ' + config.urls[url])
+            }
+            self.app.get('/url/'+url, function(req, res){
+                // return static file
+                res.redirect('/js/'+config.urls[url]);
+            });
+        }
+
         self.app.get('/', function(req, res){
             // return static file
             res.redirect('/js/static.js');
@@ -46,6 +56,7 @@ Beacon.prototype = {
 
         console.log("Opening Beacon Port");
         self.app.listen(config.beacon_port, function() {
+
             address = self.app.address();
             console.log("opened beacon server on %j", address);
         });
