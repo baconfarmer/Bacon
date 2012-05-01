@@ -30,34 +30,54 @@ Track.prototype = {
         this.writePixel(res);
         //logging
         var env = this.splitQuery(req.url.split('?')[1]);
+        var final_env={};
         //metrics tracking
         //set timestamp
-        if(!env.timestamp){
-            env.timestamp = new Date();
+        if(!env.d){
+            env.d = new Date();
         }
+        final_env.d=env.d;
         //for each in config.metrics[] call incCounter() with the metrics name
         var name;
         for (name in env){
             if (!config.metrics.indexOf(name)){
-                this.db_connection.incrCounter(name,env.timestamp,env[name]);
+                this.db_connection.incrCounter(name,env.d,env[name]);
             }
         }
         //log raw data
         var collection = 'visit';
-        //get ip address
-        env.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
         //get header
         if(!env.action){
-            env.user_agent = req.headers['user-agent'];
+            final_env.b = req.headers['user-agent'];
+            //get ip address
+            final_env.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            if(final_env.b.length>50){
+                final_env.b = final_env.b.substring(0,50);
+            }
+            else{
+                final_env=env;
+            }
             if(req.headers['referer']&&req.headers['referer']!=''){
-                env.refer = req.headers['referer'];
+                final_env.r = req.headers['referer'];
+            }
+            final_env.s=[env.width, env.height];
+            for (name in env){
+                if (config.visit_metrics.indexOf(name)){
+                    final_env[name] =env[name];
+                }
             }
         }
         else{
             collection='action';
+            for (name in env){
+                if (config.action_metrics.indexOf(name)){
+                    final_env[name] =env[name];
+                }
+            }
         }
         //insert into db
-        this.db_connection.insRaw(env, collection);
+        this.db_connection.insRaw(final_env, collection);
     },
     splitQuery: function(query) {
         var queryString = {};

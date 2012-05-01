@@ -23,8 +23,12 @@ Db.prototype = {
                 self.mongo_db.createCollection('actions', function(err, collection) {
                     self.mongo_db.collection('actions', function(err, collection) {
                         self.actions = collection;
-                        self.mongo_db.createCollection('visits', function(err, collection) {
+                        collection.ensureIndex( { v : 1, n:1, q:1,c:1} );
+//                        collection.ensureIndex( { q : 1} );
+                        self.mongo_db.createCollection('visits', function(err, collection){
                             self.mongo_db.collection('visits', function(err, collection) {
+                                collection.ensureIndex( { h : 1,  p : 1, d : 1, q:1, c:1 } );
+//                                collection.ensureIndex( { h : 1 } );
                                 self.visits = collection;
                                 callback();
                             });
@@ -95,8 +99,6 @@ Db.prototype = {
                 if(!value[x]){
                     value[x]=0;
                 }
-//                value[x]=value[x].toString();
-//                dict[ keys[x] ]=value[x];
             }
             callback(times,value);
         });
