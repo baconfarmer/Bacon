@@ -63,7 +63,7 @@ Track.prototype = {
             }
             final_env.s=[env.width, env.height];
             for (name in env){
-                if (config.visit_metrics.indexOf(name)){
+                if (config.visit_metrics.indexOf(name)!==-1){
                     final_env[name] =env[name];
                 }
             }
@@ -71,8 +71,8 @@ Track.prototype = {
         else{
             collection='action';
             for (name in env){
-                if (config.action_metrics.indexOf(name)){
-                    final_env[name] =env[name];
+                if (config.action_metrics.indexOf(name)!==-1){
+                    final_env[name] = env[name];
                 }
             }
         }

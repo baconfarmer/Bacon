@@ -16,7 +16,6 @@ module.exports = config = {
     'urls':{'a':'template.js','b':'template.js','c':'ac_template.js'},
 
     'visit_metrics':[
-        'q',
         'h',
         'p',
         't',
@@ -28,11 +27,10 @@ module.exports = config = {
         'n',
         'v',
         't',
-        'q',
         'c']
     ,
-    "udp_address" : "127.0.0.1",
-    "udp_port" : 8000,
+//    "udp_address" : "127.0.0.1",
+//    "udp_port" : 8000,
 
     "debug":0
 }

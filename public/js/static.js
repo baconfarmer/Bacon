@@ -7,7 +7,7 @@ jQuery(document).ready(function() {
 
 function track_init() {
     var env = {};
-    checkSession(env);
+    guid = checkSession(env);
     env.h = document.location.host.toString();
     path = document.location.pathname.toString();
     path = typeof path !== 'undefined' ? path : '/';
@@ -15,8 +15,6 @@ function track_init() {
     env.width= window.innerWidth.toString();
     env.height=window.innerHeight.toString();
     env.t = document.title;
-    guid = guidGenerator();
-    env._id = guid;
     if (document.referrer && document.referrer !== "") {
         env.r = document.referrer;
     }
@@ -39,7 +37,6 @@ function track(action, misc) {
     if (cyclone_dt) {
         env.t = new Date() - cyclone_dt;
     }
-    getSession(env);
     env.action=true;
     jQuery('body').append('<img style="display:none;" src="http://cyclone.inflection.com:3000/?' + jQuery.param(env) + '"/>');
 }
@@ -48,26 +45,27 @@ function guidGenerator() {
     var S4 = function () {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     };
-    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    return (S4() + S4() + S4()  + S4()  + S4() + S4() + S4() + S4());
 }
 
 function checkSession(env){
     //check for session cookie
+    var uuid = guidGenerator();
     if (get_cookie("Cyclone_SessionTS")!=""){
-        env.q=get_cookie("Cyclone_SessionTS");
+        env._id=get_cookie("Cyclone_SessionTS")+uuid.substring(0,11);
     }
     //plant cookie if none exists
     else{
-        var d = Math.floor(new Date().getTime()/1000);
-        document.cookie='Cyclone_SessionTS='+d.toString();
+
+        document.cookie='Cyclone_SessionTS='+uuid.substring(0,20);
         if (get_cookie("Cyclone_SessionTS")!=""){
-            env.q=get_cookie("Cyclone_SessionTS");
+            env._id=uuid;
         }
     }
     if (get_cookie('Cyclone_CustomerID')!=""){
         env.c=get_cookie("Cyclone_CustomerID");
     }
-    return get_cookie("Cyclone_SessionTS")
+    return env._id;
 }
 
 //Get cookie routine by Shelley Powers
@@ -87,10 +85,4 @@ function get_cookie(Name) {
         }
     }
     return returnvalue;
-}
-function getSession(env){
-    //check for session cookie
-    if (get_cookie("Cyclone_SessionTS")!=""){
-        env.q=get_cookie("Cyclone_SessionTS");
-    }
 }
