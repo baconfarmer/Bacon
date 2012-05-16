@@ -1,6 +1,7 @@
 var config = require('../config/config'),
     path = require("path"),
-    fs = require('fs');
+    fs = require('fs')
+    ,io = require('socket.io');
 
 var Track = function(tracker_app, db, callback) {
     callback = typeof callback !== 'undefined' ? callback : function(){};
@@ -16,13 +17,62 @@ var Track = function(tracker_app, db, callback) {
 Track.prototype = {
     init: function(callback) {
         callback = typeof callback !== 'undefined' ? callback : function(){};
-        self=this;
+        var self=this;
+        this.io=io.listen(this.app);
         this.app.listen(config.tracking_port, function() {
             address = self.app.address();
             console.log("opened tracking server on %j", address);
         });
         this.app.get('/', function(req, res){
              self.serveRequest(req, res);
+        });
+        this.io.sockets.on('connection', function (socket) {
+//            socket.emit('news', { hello: 'world' });
+            socket.on('search_track', function (data) {
+                var collection='search';
+                var output={};
+                for (name in data){
+                    if ( typeof config.search_metrics[name] !== 'undefined'){
+                       output[config.search_metrics[name]] =data[name];
+                        if(config.debug){
+                            console.log(config.search_metrics[name] +': '+ data[name]);
+                        }
+                    }
+                }
+                self.db_connection.insRaw(output, collection);
+            });
+            socket.on('search_track_end', function (data) {
+                var collection='id_set';
+                var output={};
+                output.set={};
+                output.id=data.id;
+                for (name in data){
+                    if ( typeof config.search_metrics[name] !== 'undefined' && name !=='id'){
+                        output.set[config.search_metrics[name]] =data[name];
+                        if(config.debug){
+                            console.log(config.search_metrics[name] +': '+ data[name]);
+                        }
+                    }
+                }
+                //console.log("id_set: "+output._id);
+                self.db_connection.insRaw(output, collection);
+            });
+            socket.on('search_track_filter', function (data) {
+                var collection='id_push';
+                var output={};
+                output.set={};
+                output.id=data.id;
+                for (name in data){
+                    if ( typeof config.search_metrics[name] !== 'undefined' && name !=='id'){
+                        output.set[config.search_metrics[name]] =data[name];
+                        if(config.debug){
+                            console.log(config.search_metrics[name] +': '+ data[name]);
+                        }
+                    }
+                }
+                //console.log("id_set: "+output._id);
+                self.db_connection.insRaw(output, collection);
+            });
         });
         callback();
     },

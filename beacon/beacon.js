@@ -45,7 +45,7 @@ Beacon.prototype = {
             }
             self.app.get('/url/'+url, function(req, res){
                 // return static file
-                res.redirect('/js/'+config.urls[url]);
+                res.redirect('/js/page_tracking/'+config.urls[url]);
             });
         }
 

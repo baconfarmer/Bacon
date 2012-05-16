@@ -13,8 +13,20 @@ module.exports = config = {
     "mongo_port" : 27017,
 
     'metrics':['pageview'],
-    'urls':{'a':'template.js','b':'template.js','c':'ac_template.js'},
-
+    'urls':{'psp.aspx_act=resultsids':'psp.aspx_act=resultsids.js'},
+    'search_metrics':{'firstname':'f'
+        ,'lastname':'l'
+        ,'middlename':'m'
+        ,'maidenname':'o'
+        ,'state':'s'
+        ,'zip':'z'
+        ,'city':'p'//place
+        ,'id':'id'
+        ,'count':'c'
+        ,'duration':'d' //duration
+        ,'target':'t' //
+        ,'pick':'i'//pick
+    },
     'visit_metrics':[
         'h',
         'p',

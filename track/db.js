@@ -30,7 +30,15 @@ Db.prototype = {
                                 collection.ensureIndex( { id:1, d : 1, c:1, p : 1 } );
 //                                collection.ensureIndex( { h : 1 } );
                                 self.visits = collection;
-                                callback();
+                                self.mongo_db.createCollection('searches', function(err, collection){
+                                    self.mongo_db.collection('searches', function(err, collection) {
+                                        collection.ensureIndex( {  id : 1, f: 1, l:1 } );
+                                        collection.ensureIndex( {  d : 1, c: 1 } );
+////                                collection.ensureIndex( { h : 1 } );
+                                        self.searches = collection;
+                                        callback();
+                                    });
+                                });
                             });
                         });
                     });
@@ -54,6 +62,25 @@ Db.prototype = {
                     console.log("Mongod - visits");
                 }
                 this.visits.insert([env]);
+                break;
+            case "search":
+                if(config.debug){
+                    console.log("Mongod - searches");
+                }
+                this.searches.insert([env]);
+                break;
+            case "id_push":
+                if(config.debug){
+                    console.log("id_push");
+                }
+                this.searches.update({'id':env.id},{'$push':env.push});
+                break;
+            case "id_set":
+                if(config.debug){
+                    console.log("id_set");
+                }
+//                console.log("id_set: "+env._id);
+                this.searches.update({'id':env.id},{'$set': env.set});
                 break;
         }
     },
