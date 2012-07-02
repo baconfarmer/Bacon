@@ -3,6 +3,7 @@ var config = require('../config/config'),
     fs = require('fs')
     ,io = require('socket.io');
 
+
 var Track = function(tracker_app, db, callback) {
     callback = typeof callback !== 'undefined' ? callback : function(){};
     this.app=tracker_app;
@@ -18,7 +19,16 @@ Track.prototype = {
     init: function(callback) {
         callback = typeof callback !== 'undefined' ? callback : function(){};
         var self=this;
-        this.io=io.listen(this.app);
+
+        this.io=io.listen(this.app,{'transports': [
+            'websocket'
+                , 'htmlfile'
+                , 'jsonp-polling'
+            ]});
+//        this.io.configure('development', function(){
+//            io.set('log level', 1);
+//            io.set();
+//        });
         this.app.listen(config.tracking_port, function() {
             address = self.app.address();
             console.log("opened tracking server on %j", address);
@@ -31,6 +41,7 @@ Track.prototype = {
             socket.on('search_track', function (data) {
                 var collection='search';
                 var output={};
+                output.T=new Date();
                 for (name in data){
                     if ( typeof config.search_metrics[name] !== 'undefined'){
                        output[config.search_metrics[name]] =data[name];
@@ -45,9 +56,9 @@ Track.prototype = {
                 var collection='id_set';
                 var output={};
                 output.set={};
-                output.id=data.id;
+                output._id=data._id;
                 for (name in data){
-                    if ( typeof config.search_metrics[name] !== 'undefined' && name !=='id'){
+                    if ( typeof config.search_metrics[name] !== 'undefined' && name !=='_id'){
                         output.set[config.search_metrics[name]] =data[name];
                         if(config.debug){
                             console.log(config.search_metrics[name] +': '+ data[name]);
@@ -61,9 +72,10 @@ Track.prototype = {
                 var collection='id_push';
                 var output={};
                 output.set={};
-                output.id=data.id;
+                output._id=data._id;
+
                 for (name in data){
-                    if ( typeof config.search_metrics[name] !== 'undefined' && name !=='id'){
+                    if ( typeof config.search_metrics[name] !== 'undefined' && name !=='_id'){
                         output.set[config.search_metrics[name]] =data[name];
                         if(config.debug){
                             console.log(config.search_metrics[name] +': '+ data[name]);
@@ -106,12 +118,12 @@ Track.prototype = {
                 final_env.b = final_env.b.substring(0,50);
             }
             else{
-                final_env=env;
+                final_env.b=env.b;
             }
-            if(req.headers['referer']&&req.headers['referer']!=''){
-                final_env.r = req.headers['referer'];
-            }
-            final_env.s=[env.width, env.height];
+//            if(req.headers['referer']&&req.headers['referer']!=''){
+//                final_env.r = req.headers['referer'];
+//            }
+            //final_env.s=[env.width, env.height];
             for (name in env){
                 if (config.visit_metrics.indexOf(name)!==-1){
                     final_env[name] =env[name];
@@ -123,6 +135,9 @@ Track.prototype = {
             for (name in env){
                 if (config.action_metrics.indexOf(name)!==-1){
                     final_env[name] = env[name];
+                }
+                if (name==='v'){
+                    final_env[name] = JSON.parse(env[name])
                 }
             }
         }

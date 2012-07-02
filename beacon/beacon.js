@@ -30,10 +30,10 @@ Beacon.prototype = {
             }
         });
 
-        self.app.get('/beacon', function(req, res){
-            // return beacon
-            res.redirect('/js/template.js');
-        });
+//        self.app.get('/beacon', function(req, res){
+//            // return beacon
+//            res.redirect('/js/template.js');
+//        });
 
         self.app.on('error', function() {
             console.log("error");
@@ -49,9 +49,10 @@ Beacon.prototype = {
             });
         }
 
-        self.app.get('/', function(req, res){
+        self.app.get('/url/*', function(req, res){
             // return static file
-            res.redirect('/js/static.js');
+            res.send('');
+//            res.redirect('/js/static.js');
         });
 
         console.log("Opening Beacon Port");

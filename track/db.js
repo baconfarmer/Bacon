@@ -73,14 +73,14 @@ Db.prototype = {
                 if(config.debug){
                     console.log("id_push");
                 }
-                this.searches.update({'id':env.id},{'$push':env.push});
+                this.searches.update({'_id':env._id},{'$push':env.push});
                 break;
             case "id_set":
                 if(config.debug){
                     console.log("id_set");
                 }
 //                console.log("id_set: "+env._id);
-                this.searches.update({'id':env.id},{'$set': env.set});
+                this.searches.update({'_id':env._id},{'$set': env.set});
                 break;
         }
     },

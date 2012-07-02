@@ -13,7 +13,10 @@ module.exports = config = {
     "mongo_port" : 27017,
 
     'metrics':['pageview'],
-    'urls':{'psp.aspx_act=resultsids':'psp.aspx_act=resultsids.js'},
+    'urls':{
+    //    'resultsids/psp.aspx':'psp.aspx_act=resultsids.js',
+        'no_act/identity/profile.html':'profile.js'
+        ,'resultswp/psp.aspx':'psp.aspx_act=resultswp.js'},
     'search_metrics':{'firstname':'f'
         ,'lastname':'l'
         ,'middlename':'m'
@@ -21,25 +24,35 @@ module.exports = config = {
         ,'state':'s'
         ,'zip':'z'
         ,'city':'p'//place
-        ,'id':'id'
+        ,'session':'z'//session id
+        ,'visit':'v'
+        ,'_id':'_id'
         ,'count':'c'
         ,'duration':'d' //duration
         ,'target':'t' //
         ,'pick':'i'//pick
+        ,'funnel':'g' //search group
     },
     'visit_metrics':[
-        'h',
-        'p',
-        't',
-        '_id',
-        'c']
+        'h',//domain
+        'p',//path
+        'r',//referrer
+        '_id',//pk
+        'a',//action
+        't',//title
+        'c', //customer id
+        'v', //visit id
+        't',//split test
+        's' //session id
+            ]
     ,
     'action_metrics':[
-        'p',
-        'n',
-        'v',
-        't',
-        'c']
+        'p', //page id
+        'n',//event name
+        's',//session id
+        't',//time relative
+        'v' //Values
+        ]
     ,
 //    "udp_address" : "127.0.0.1",
 //    "udp_port" : 8000,
