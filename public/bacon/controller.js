@@ -1,8 +1,12 @@
 var bacon = bacon || {};
 
 require(["lib/jquery-1.7.1.min","lib/underscore",'lib/backbone-min','writer','parser'], function($) {
-    var options ={page_data:storm}
-    bacon.c = new bacon.Controller(options);
+    var options ={page_data:storm};
+    bacon.c = new bacon.Controller(options,function(){
+        bacon.p = new bacon.Parser();
+        bacon.w = new bacon.Writer();
+    } );
+
 });
 
 bacon.Controller= function(options, callback) {
@@ -22,9 +26,11 @@ bacon.Controller.prototype={
         }
     },
     main: function(url){
+        var self = this;
         require([url], function() {
-            console.log(bacon.config);
-
+            self.config = bacon.config;
+            self.initParser();
+            self.initWriter();
         });
     },
     getAction:function(data){
@@ -35,15 +41,19 @@ bacon.Controller.prototype={
         }
         return false;
     },
-    setEvent:function(){
+    setEvent: function(){
         bacon.vent = _.extend({}, Backbone.Events);
         this.vent = bacon.vent;
         return this.vent
     },
-    initParser:function(){
-
+    initParser: function(){
+        _.each(this.config.parser, this.triggerInit);
     },
-    initWriter:function(){
-
+    initWriter: function(){
+        _.each(this.config.writer, this.triggerInit);
+    },
+    triggerInit: function(value,key,list){
+        value.options = value.options || {};
+        bacon.vent.trigger('init:'+value.name,value.options)
     }
 }
