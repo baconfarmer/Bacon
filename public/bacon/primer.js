@@ -11,22 +11,20 @@ var bacon = bacon || {};
             if(typeof (jQuery)==='undefined'){
                 this.loadScript("https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js", function () {
                     jQuery(document).ready(function(){
-                        self.checkStatus("/bacon/actions/"+self.getAction()+'.js',self.initBacon);
+                        self.checkStatus("/bacon/actions/"+window.location.hostname+'.js',self.initBacon);
                     });
                 });
             }
             else{
                 jQuery(document).ready(function(){
-                    self.checkStatus("/bacon/actions/"+self.getAction()+'.js',self.initBacon);
+                    self.checkStatus("/bacon/actions/"+window.location.hostname+'.js',self.initBacon);
                 });
             }
         },
         initBacon: function(config_success){
           if(config_success){
               var options ={page_data:storm};
-              bacon.c = new bacon.Controller(options,function(){
-
-              } );
+              bacon.c = new bacon.Controller(options,function(){});
           }
         },
         loadScript: function(url, callback) {
@@ -52,25 +50,24 @@ var bacon = bacon || {};
                 jQuery.ajax({
                     url: address,
                     success: function(){
-//                        console.log(bacon);
                         callback(true);
                     },
                     error: function(){
                         callback(false);
-//                        console.log('config not found');
                     }
                 });
             }
-        },
-        getAction: function (){
-            var data = storm;
-            if(typeof data.action !== 'undefined'){
-                if(typeof data.action.id !== 'undefined'){
-                    return data.action.id;
-                }
-            }
-            return false;
         }
+//        ,
+//        getAction: function (){
+//            var data = storm;
+//            if(typeof data.action !== 'undefined'){
+//                if(typeof data.action.id !== 'undefined'){
+//                    return data.action.id;
+//                }
+//            }
+//            return false;
+//        }
     }
 
     bacon.Controller= function(options, callback) {
@@ -85,36 +82,47 @@ var bacon = bacon || {};
             bacon.w = new bacon.Writer({},function(){
                 bacon.p = new bacon.Parser();
             });
-            this.config = bacon.config;
+            this.config = bacon.config[this.getAction()];
             this.initParser();
             this.initWriter();
         },
         setEvent: function(){
-            bacon.trackEvent = function(category) {
-                console.log(category);
-            }
+//            bacon.trackEvent = function(category) {
+////                console.log(category);
+//            }
             bacon.vent = jQuery('<div id="#baconEvents"></div>').appendTo('body');
             this.vent = bacon.vent;
             return this.vent
         },
         initParser: function(){
             var self = this;
-            this.config.paraser = this.config.parser || [];
+            this.config = this.config || {};
+            this.config.parser = this.config.parser || [];
             this.config.parser.forEach(function(object){
                 self.triggerInit(object);
             });
         },
         initWriter: function(){
             var self = this;
+            this.config = this.config || {};
             this.config.writer = this.config.writer || [];
             this.config.writer.forEach(function(object){
                 self.triggerInit(object);
             });
         },
         triggerInit: function(value,key,list){
+            console.log(value.name);
             value.options = value.options || {};
-//            console.log(value.name);
             this.vent.trigger('init-'+value.name,value.options);
+        },
+        getAction: function (){
+            var data = storm;
+            if(typeof data.action !== 'undefined'){
+                if(typeof data.action.id !== 'undefined'){
+                    return data.action.id;
+                }
+            }
+            return window.location.pathname;
         }
     }
 
