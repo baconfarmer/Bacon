@@ -1,12 +1,11 @@
 var bacon = bacon || {};
 
-require(["lib/jquery-1.7.1.min","lib/underscore",'lib/backbone-min','writer','parser'], function($) {
+require(["lib/jquery-1.7.1.min",'writer','parser'], function($) {
     var options ={page_data:storm};
     bacon.c = new bacon.Controller(options,function(){
         bacon.p = new bacon.Parser();
         bacon.w = new bacon.Writer();
     } );
-
 });
 
 bacon.Controller= function(options, callback) {
@@ -34,26 +33,41 @@ bacon.Controller.prototype={
         });
     },
     getAction:function(data){
-        if(_.has(data,'action')){
-            if(_.has(data.action,'id')){
+        if(typeof data.action !== 'undefined'){
+            if(typeof data.action.id !== 'undefined'){
                 return data.action.id;
             }
         }
         return false;
     },
     setEvent: function(){
-        bacon.vent = _.extend({}, Backbone.Events);
+        bacon.trackEvent = function(category) {
+            console.log(category);
+        }
+        bacon.vent = $('<div id="#baconEvents"></div>').appendTo('body');
+//        $('body').append();
+//        bacon.vent = $('#baconEvents');
+//        bacon.vent = _.extend({}, Backbone.Events);
         this.vent = bacon.vent;
         return this.vent
     },
     initParser: function(){
-        _.each(this.config.parser, this.triggerInit);
+        var self = this;
+        this.config.paraser = this.config.parser || [];
+        this.config.parser.forEach(function(object){
+            self.triggerInit(object);
+        });
     },
     initWriter: function(){
-        _.each(this.config.writer, this.triggerInit);
+        var self = this;
+        this.config.writer = this.config.writer || [];
+        this.config.writer.forEach(function(object){
+            self.triggerInit(object);
+        });
     },
     triggerInit: function(value,key,list){
         value.options = value.options || {};
-        bacon.vent.trigger('init:'+value.name,value.options)
+        console.log(value.name);
+        this.vent.trigger('init-'+value.name,value.options);
     }
 }
