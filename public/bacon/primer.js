@@ -11,13 +11,13 @@ var bacon = bacon || {};
             if(typeof (jQuery)==='undefined'){
                 this.loadScript("https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js", function () {
                     jQuery(document).ready(function(){
-                        self.checkStatus("/bacon/actions/"+window.location.hostname+'.js',self.initBacon);
+                        self.checkStatus("http://psp-beta.intranet.peoplesearchmedia.com/waf/js/bacon/id/actions/"+window.location.hostname+'.js',self.initBacon);
                     });
                 });
             }
             else{
                 jQuery(document).ready(function(){
-                    self.checkStatus("/bacon/actions/"+window.location.hostname+'.js',self.initBacon);
+                    self.checkStatus("http://psp-beta.intranet.peoplesearchmedia.com/waf/js/bacon/id/actions/"+window.location.hostname+'.js',self.initBacon);
                 });
             }
         },
